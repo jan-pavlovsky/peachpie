@@ -44,6 +44,13 @@ namespace Peachpie.Library.Network
         /// </summary>
         public PhpArray Headers { get; set; }
 
+        /// <summary>
+        /// Cookies to be send with the request.
+        /// 
+        /// String with structure defined by curl-options.
+        /// </summary>
+        public string Cookies { get; set; }
+
         public bool ReturnTransfer { get; set; } = false;
 
         /// <summary>

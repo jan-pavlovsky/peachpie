@@ -226,8 +226,10 @@ namespace Peachpie.Library.Network
             if (ch.UserAgent != null) req.UserAgent = ch.UserAgent;
             if (ch.Referer != null) req.Referer = ch.Referer;
             if (ch.Headers != null) AddHeaders(req, ch.Headers);
-            // TODO: cookies
+            // TODO: cookies advanced
             req.CookieContainer = new CookieContainer();
+            if (ch.Cookies != null) AddCookies(req, ch.Cookies);
+
             // TODO: certificate
             // TODO: credentials
             // TODO: proxy
@@ -351,7 +353,47 @@ namespace Peachpie.Library.Network
             return formDataStream.ToArray();
         }
 
-        static void AddHeaders(HttpWebRequest req, PhpArray headers)
+        public static void AddCookies(this HttpWebRequest webRequest, string cookies)
+        {
+            Debug.Assert(webRequest.CookieContainer != null);
+
+            string name = null;
+            string value = null;
+
+            var sb = new StringBuilder();
+            for (int i = 0; i < cookies.Length; i++)
+            {
+                var currChar = cookies[i];
+                switch (currChar)
+                {
+                    case '=':
+                        name = sb.ToString();
+                        sb.Clear();
+                        break;
+                    case ';':
+                        i++; //skip the required space
+                        value = sb.ToString();
+                        sb.Clear();
+
+                        webRequest.CookieContainer.Add(new Cookie(name, value, "/", webRequest.Address.Host));
+                        name = null; value = null;
+                        break;
+                    default:
+                        sb.Append(currChar);
+                        break;
+                }
+
+            }
+
+            if(name != null)
+            {
+                value = sb.ToString();
+                var newCookie = new Cookie(name, value, "/", webRequest.Address.Host);
+                webRequest.CookieContainer.Add(newCookie);
+            }
+        }
+
+    static void AddHeaders(HttpWebRequest req, PhpArray headers)
         {
             var enumerator = headers.GetFastEnumerator();
             while (enumerator.MoveNext())
