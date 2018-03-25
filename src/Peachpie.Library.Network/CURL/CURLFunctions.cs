@@ -371,7 +371,7 @@ namespace Peachpie.Library.Network
                         sb.Clear();
                         break;
                     case ';':
-                        i++; //skip the required space
+                        if (isSpaceAhead(cookies, i)) i++;
                         value = sb.ToString();
                         sb.Clear();
 
@@ -391,9 +391,14 @@ namespace Peachpie.Library.Network
                 var newCookie = new Cookie(name, value, "/", webRequest.Address.Host);
                 webRequest.CookieContainer.Add(newCookie);
             }
+
+            bool isSpaceAhead(string str, int i)
+            {
+                return ((i + 1) < str.Length && str[i + 1] == ' ');
+            }
         }
 
-    static void AddHeaders(HttpWebRequest req, PhpArray headers)
+        static void AddHeaders(HttpWebRequest req, PhpArray headers)
         {
             var enumerator = headers.GetFastEnumerator();
             while (enumerator.MoveNext())
